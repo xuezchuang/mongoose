@@ -17,6 +17,8 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only or commercial
 
+
+
 #ifndef MONGOOSE_H
 #define MONGOOSE_H
 
@@ -68,8 +70,10 @@ extern "C" {
 #endif
 #endif  // !defined(MG_ARCH)
 
-// if the user did not specify an MG_ARCH, or specified a custom one, OR
-// we guessed a known IDE, pull the customized config (Configuration Wizard)
+
+
+	// if the user did not specify an MG_ARCH, or specified a custom one, OR
+	// we guessed a known IDE, pull the customized config (Configuration Wizard)
 #if !defined(MG_ARCH) || (MG_ARCH == MG_ARCH_CUSTOM) || MG_ARCH == MG_ARCH_ARMCC
 #include "mongoose_custom.h"  // keep this include
 #endif
@@ -205,17 +209,19 @@ extern "C" {
 #define strdup(s) ((char *) mg_strdup(mg_str(s)).ptr)
 
 // Re-route calloc/free to the FreeRTOS's functions, don't use stdlib
-static inline void *mg_calloc(size_t cnt, size_t size) {
-  void *p = pvPortMalloc(cnt * size);
-  if (p != NULL) memset(p, 0, size * cnt);
-  return p;
-}
+	static inline void* mg_calloc(size_t cnt, size_t size)
+	{
+		void* p = pvPortMalloc(cnt * size);
+		if(p != NULL) memset(p, 0, size * cnt);
+		return p;
+	}
 
 #define mkdir(a, b) mg_mkdir(a, b)
-static inline int mg_mkdir(const char *path, mode_t mode) {
-  (void) path, (void) mode;
-  return -1;
-}
+	static inline int mg_mkdir(const char* path, mode_t mode)
+	{
+		(void)path, (void)mode;
+		return -1;
+	}
 
 #endif  // MG_ARCH == MG_ARCH_FREERTOS
 
@@ -254,7 +260,7 @@ static inline int mg_mkdir(const char *path, mode_t mode) {
 #include <time.h>
 
 #include <pico/stdlib.h>
-int mkdir(const char *, mode_t);
+	int mkdir(const char*, mode_t);
 #endif
 
 
@@ -297,8 +303,8 @@ int mkdir(const char *, mode_t);
 #include <time.h>
 #if MG_ARCH == MG_ARCH_CMSIS_RTOS1
 #include "cmsis_os.h"  // keep this include
-// https://developer.arm.com/documentation/ka003821/latest
-extern uint32_t rt_time_get(void);
+	// https://developer.arm.com/documentation/ka003821/latest
+	extern uint32_t rt_time_get(void);
 #elif MG_ARCH == MG_ARCH_CMSIS_RTOS2
 #include "cmsis_os2.h"  // keep this include
 #endif
@@ -308,10 +314,11 @@ extern uint32_t rt_time_get(void);
 #if defined(__ARMCC_VERSION)
 #define mode_t size_t
 #define mkdir(a, b) mg_mkdir(a, b)
-static inline int mg_mkdir(const char *path, mode_t mode) {
-  (void) path, (void) mode;
-  return -1;
-}
+	static inline int mg_mkdir(const char* path, mode_t mode)
+	{
+		(void)path, (void)mode;
+		return -1;
+	}
 #endif
 
 #if (MG_ARCH == MG_ARCH_CMSIS_RTOS1 || MG_ARCH == MG_ARCH_CMSIS_RTOS2) &&     \
@@ -432,15 +439,15 @@ static inline int mg_mkdir(const char *path, mode_t mode) {
 
 #if defined(_MSC_VER) && _MSC_VER < 1700
 #define __func__ ""
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-typedef unsigned char uint8_t;
-typedef char int8_t;
-typedef unsigned short uint16_t;
-typedef short int16_t;
-typedef unsigned int uint32_t;
-typedef int int32_t;
-typedef enum { false = 0, true = 1 } bool;
+	typedef __int64 int64_t;
+	typedef unsigned __int64 uint64_t;
+	typedef unsigned char uint8_t;
+	typedef char int8_t;
+	typedef unsigned short uint16_t;
+	typedef short int16_t;
+	typedef unsigned int uint32_t;
+	typedef int int32_t;
+	typedef enum { false = 0, true = 1 } bool;
 #else
 #include <stdbool.h>
 #include <stdint.h>
@@ -451,8 +458,8 @@ typedef enum { false = 0, true = 1 } bool;
 #include <winerror.h>
 #include <winsock2.h>
 
-// Protect from calls like std::snprintf in app code
-// See https://github.com/cesanta/mongoose/issues/1047
+	// Protect from calls like std::snprintf in app code
+	// See https://github.com/cesanta/mongoose/issues/1047
 #ifndef __cplusplus
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
@@ -463,7 +470,7 @@ typedef enum { false = 0, true = 1 } bool;
 
 #define MG_INVALID_SOCKET INVALID_SOCKET
 #define MG_SOCKET_TYPE SOCKET
-typedef unsigned long nfds_t;
+	typedef unsigned long nfds_t;
 #if defined(_MSC_VER)
 #pragma comment(lib, "ws2_32.lib")
 #ifndef alloca
@@ -473,7 +480,7 @@ typedef unsigned long nfds_t;
 #define poll(a, b, c) WSAPoll((a), (b), (c))
 #define closesocket(x) closesocket(x)
 
-typedef int socklen_t;
+	typedef int socklen_t;
 #define MG_DIRSEP '\\'
 
 #ifndef MG_PATH_MAX
@@ -547,8 +554,8 @@ typedef int socklen_t;
 
 #define MG_ENABLE_SSI 0
 
-int rand(void);
-int sscanf(const char *, const char *, ...);
+	int rand(void);
+	int sscanf(const char*, const char*, ...);
 
 #endif
 
@@ -565,8 +572,8 @@ int sscanf(const char *, const char *, ...);
 #define MG_SOCKET_TYPE Socket_t
 #define MG_INVALID_SOCKET FREERTOS_INVALID_SOCKET
 
-// Why FreeRTOS-TCP did not implement a clean BSD API, but its own thing
-// with FreeRTOS_ prefix, is beyond me
+	// Why FreeRTOS-TCP did not implement a clean BSD API, but its own thing
+	// with FreeRTOS_ prefix, is beyond me
 #define IPPROTO_TCP FREERTOS_IPPROTO_TCP
 #define IPPROTO_UDP FREERTOS_IPPROTO_UDP
 #define AF_INET FREERTOS_AF_INET
@@ -608,15 +615,17 @@ int sscanf(const char *, const char *, ...);
 #define getsockname(a, b, c) mg_getsockname((a), (b), (c))
 #define getpeername(a, b, c) mg_getpeername((a), (b), (c))
 
-static inline int mg_getsockname(MG_SOCKET_TYPE fd, void *buf, socklen_t *len) {
-  (void) fd, (void) buf, (void) len;
-  return -1;
-}
+	static inline int mg_getsockname(MG_SOCKET_TYPE fd, void* buf, socklen_t* len)
+	{
+		(void)fd, (void)buf, (void)len;
+		return -1;
+	}
 
-static inline int mg_getpeername(MG_SOCKET_TYPE fd, void *buf, socklen_t *len) {
-  (void) fd, (void) buf, (void) len;
-  return 0;
-}
+	static inline int mg_getpeername(MG_SOCKET_TYPE fd, void* buf, socklen_t* len)
+	{
+		(void)fd, (void)buf, (void)len;
+		return 0;
+	}
 #endif
 
 
@@ -626,7 +635,7 @@ static inline int mg_getpeername(MG_SOCKET_TYPE fd, void *buf, socklen_t *len) {
 #include <sys/stat.h>
 #endif
 
-struct timeval;
+	struct timeval;
 
 #include <lwip/sockets.h>
 
@@ -634,15 +643,16 @@ struct timeval;
 #if defined(__GNUC__) && !defined(__ARMCC_VERSION) // armclang sets both
 #include <sys/time.h>
 #else
-struct timeval {
-  time_t tv_sec;
-  long tv_usec;
-};
+	struct timeval
+	{
+		time_t tv_sec;
+		long tv_usec;
+	};
 #endif
 #endif
 
 #if LWIP_SOCKET != 1
-// Sockets support disabled in LWIP by default
+	// Sockets support disabled in LWIP by default
 #error Set LWIP_SOCKET variable to 1 (in lwipopts.h)
 #endif
 #endif
@@ -834,10 +844,11 @@ struct timeval {
 
 
 
-struct mg_str {
-  const char *ptr;  // Pointer to string data
-  size_t len;       // String len
-};
+	struct mg_str
+	{
+		const char* ptr;  // Pointer to string data
+		size_t len;       // String len
+	};
 
 #define MG_NULL_STR \
   { NULL, 0 }
@@ -845,84 +856,85 @@ struct mg_str {
 #define MG_C_STR(a) \
   { (a), sizeof(a) - 1 }
 
-// Using macro to avoid shadowing C++ struct constructor, see #1298
+	// Using macro to avoid shadowing C++ struct constructor, see #1298
 #define mg_str(s) mg_str_s(s)
 
-struct mg_str mg_str(const char *s);
-struct mg_str mg_str_n(const char *s, size_t n);
-int mg_lower(const char *s);
-int mg_ncasecmp(const char *s1, const char *s2, size_t len);
-int mg_casecmp(const char *s1, const char *s2);
-int mg_vcmp(const struct mg_str *s1, const char *s2);
-int mg_vcasecmp(const struct mg_str *str1, const char *str2);
-int mg_strcmp(const struct mg_str str1, const struct mg_str str2);
-struct mg_str mg_strstrip(struct mg_str s);
-struct mg_str mg_strdup(const struct mg_str s);
-const char *mg_strstr(const struct mg_str haystack, const struct mg_str needle);
-bool mg_match(struct mg_str str, struct mg_str pattern, struct mg_str *caps);
-bool mg_globmatch(const char *pattern, size_t plen, const char *s, size_t n);
-bool mg_commalist(struct mg_str *s, struct mg_str *k, struct mg_str *v);
-bool mg_split(struct mg_str *s, struct mg_str *k, struct mg_str *v, char delim);
-char *mg_hex(const void *buf, size_t len, char *dst);
-void mg_unhex(const char *buf, size_t len, unsigned char *to);
-unsigned long mg_unhexn(const char *s, size_t len);
-bool mg_path_is_sane(const char *path);
+	struct mg_str mg_str(const char* s);
+	struct mg_str mg_str_n(const char* s, size_t n);
+	int mg_lower(const char* s);
+	int mg_ncasecmp(const char* s1, const char* s2, size_t len);
+	int mg_casecmp(const char* s1, const char* s2);
+	int mg_vcmp(const struct mg_str* s1, const char* s2);
+	int mg_vcasecmp(const struct mg_str* str1, const char* str2);
+	int mg_strcmp(const struct mg_str str1, const struct mg_str str2);
+	struct mg_str mg_strstrip(struct mg_str s);
+	struct mg_str mg_strdup(const struct mg_str s);
+	const char* mg_strstr(const struct mg_str haystack, const struct mg_str needle);
+	bool mg_match(struct mg_str str, struct mg_str pattern, struct mg_str* caps);
+	bool mg_globmatch(const char* pattern, size_t plen, const char* s, size_t n);
+	bool mg_commalist(struct mg_str* s, struct mg_str* k, struct mg_str* v);
+	bool mg_split(struct mg_str* s, struct mg_str* k, struct mg_str* v, char delim);
+	char* mg_hex(const void* buf, size_t len, char* dst);
+	void mg_unhex(const char* buf, size_t len, unsigned char* to);
+	unsigned long mg_unhexn(const char* s, size_t len);
+	bool mg_path_is_sane(const char* path);
 
 
 
 
-// Single producer, single consumer non-blocking queue
+	// Single producer, single consumer non-blocking queue
 
-struct mg_queue {
-  char *buf;
-  size_t size;
-  volatile size_t tail;
-  volatile size_t head;
-};
+	struct mg_queue
+	{
+		char* buf;
+		size_t size;
+		volatile size_t tail;
+		volatile size_t head;
+	};
 
-void mg_queue_init(struct mg_queue *, char *, size_t);        // Init queue
-size_t mg_queue_book(struct mg_queue *, char **buf, size_t);  // Reserve space
-void mg_queue_add(struct mg_queue *, size_t);                 // Add new message
-size_t mg_queue_next(struct mg_queue *, char **);  // Get oldest message
-void mg_queue_del(struct mg_queue *, size_t);      // Delete oldest message
-
-
-
-
-typedef void (*mg_pfn_t)(char, void *);                  // Output function
-typedef size_t (*mg_pm_t)(mg_pfn_t, void *, va_list *);  // %M printer
-
-size_t mg_vxprintf(void (*)(char, void *), void *, const char *fmt, va_list *);
-size_t mg_xprintf(void (*fn)(char, void *), void *, const char *fmt, ...);
+	void mg_queue_init(struct mg_queue*, char*, size_t);        // Init queue
+	size_t mg_queue_book(struct mg_queue*, char** buf, size_t);  // Reserve space
+	void mg_queue_add(struct mg_queue*, size_t);                 // Add new message
+	size_t mg_queue_next(struct mg_queue*, char**);  // Get oldest message
+	void mg_queue_del(struct mg_queue*, size_t);      // Delete oldest message
 
 
 
 
+	typedef void (*mg_pfn_t)(char, void*);                  // Output function
+	typedef size_t(*mg_pm_t)(mg_pfn_t, void*, va_list*);  // %M printer
+
+	size_t mg_vxprintf(void (*)(char, void*), void*, const char* fmt, va_list*);
+	size_t mg_xprintf(void (*fn)(char, void*), void*, const char* fmt, ...);
 
 
-// Convenience wrappers around mg_xprintf
-size_t mg_vsnprintf(char *buf, size_t len, const char *fmt, va_list *ap);
-size_t mg_snprintf(char *, size_t, const char *fmt, ...);
-char *mg_vmprintf(const char *fmt, va_list *ap);
-char *mg_mprintf(const char *fmt, ...);
-size_t mg_queue_vprintf(struct mg_queue *, const char *fmt, va_list *);
-size_t mg_queue_printf(struct mg_queue *, const char *fmt, ...);
 
-// %M print helper functions
-size_t mg_print_base64(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_esc(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_hex(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_ip(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_ip_port(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_ip4(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_ip6(void (*out)(char, void *), void *arg, va_list *ap);
-size_t mg_print_mac(void (*out)(char, void *), void *arg, va_list *ap);
 
-// Various output functions
-void mg_pfn_iobuf(char ch, void *param);  // param: struct mg_iobuf *
-void mg_pfn_stdout(char c, void *param);  // param: ignored
 
-// A helper macro for printing JSON: mg_snprintf(buf, len, "%m", MG_ESC("hi"))
+
+	// Convenience wrappers around mg_xprintf
+	size_t mg_vsnprintf(char* buf, size_t len, const char* fmt, va_list* ap);
+	size_t mg_snprintf(char*, size_t, const char* fmt, ...);
+	char* mg_vmprintf(const char* fmt, va_list* ap);
+	char* mg_mprintf(const char* fmt, ...);
+	size_t mg_queue_vprintf(struct mg_queue*, const char* fmt, va_list*);
+	size_t mg_queue_printf(struct mg_queue*, const char* fmt, ...);
+
+	// %M print helper functions
+	size_t mg_print_base64(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_esc(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_hex(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_ip(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_ip_port(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_ip4(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_ip6(void (*out)(char, void*), void* arg, va_list* ap);
+	size_t mg_print_mac(void (*out)(char, void*), void* arg, va_list* ap);
+
+	// Various output functions
+	void mg_pfn_iobuf(char ch, void* param);  // param: struct mg_iobuf *
+	void mg_pfn_stdout(char c, void* param);  // param: ignored
+
+	// A helper macro for printing JSON: mg_snprintf(buf, len, "%m", MG_ESC("hi"))
 #define MG_ESC(str) mg_print_esc, 0, (str)
 
 
@@ -930,14 +942,14 @@ void mg_pfn_stdout(char c, void *param);  // param: ignored
 
 
 
-enum { MG_LL_NONE, MG_LL_ERROR, MG_LL_INFO, MG_LL_DEBUG, MG_LL_VERBOSE };
-extern int mg_log_level;  // Current log level, one of MG_LL_*
+	enum { MG_LL_NONE, MG_LL_ERROR, MG_LL_INFO, MG_LL_DEBUG, MG_LL_VERBOSE };
+	extern int mg_log_level;  // Current log level, one of MG_LL_*
 
-void mg_log(const char *fmt, ...);
-void mg_log_prefix(int ll, const char *file, int line, const char *fname);
-// bool mg_log2(int ll, const char *file, int line, const char *fmt, ...);
-void mg_hexdump(const void *buf, size_t len);
-void mg_log_set_fn(mg_pfn_t fn, void *param);
+	void mg_log(const char* fmt, ...);
+	void mg_log_prefix(int ll, const char* file, int line, const char* fname);
+	// bool mg_log2(int ll, const char *file, int line, const char *fmt, ...);
+	void mg_hexdump(const void* buf, size_t len);
+	void mg_log_set_fn(mg_pfn_t fn, void* param);
 
 #define mg_log_set(level_) mg_log_level = (level_)
 
@@ -964,74 +976,77 @@ void mg_log_set_fn(mg_pfn_t fn, void *param);
 
 
 
-struct mg_timer {
-  unsigned long id;         // Timer ID
-  uint64_t period_ms;       // Timer period in milliseconds
-  uint64_t expire;          // Expiration timestamp in milliseconds
-  unsigned flags;           // Possible flags values below
+	struct mg_timer
+	{
+		unsigned long id;         // Timer ID
+		uint64_t period_ms;       // Timer period in milliseconds
+		uint64_t expire;          // Expiration timestamp in milliseconds
+		unsigned flags;           // Possible flags values below
 #define MG_TIMER_ONCE 0     // Call function once
 #define MG_TIMER_REPEAT 1   // Call function periodically
 #define MG_TIMER_RUN_NOW 2  // Call immediately when timer is set
-  void (*fn)(void *);       // Function to call
-  void *arg;                // Function argument
-  struct mg_timer *next;    // Linkage
-};
+		void (*fn)(void*);       // Function to call
+		void* arg;                // Function argument
+		struct mg_timer* next;    // Linkage
+	};
 
-void mg_timer_init(struct mg_timer **head, struct mg_timer *timer,
-                   uint64_t milliseconds, unsigned flags, void (*fn)(void *),
-                   void *arg);
-void mg_timer_free(struct mg_timer **head, struct mg_timer *);
-void mg_timer_poll(struct mg_timer **head, uint64_t new_ms);
-bool mg_timer_expired(uint64_t *expiration, uint64_t period, uint64_t now);
-
-
+	void mg_timer_init(struct mg_timer** head, struct mg_timer* timer,
+					   uint64_t milliseconds, unsigned flags, void (*fn)(void*),
+					   void* arg);
+	void mg_timer_free(struct mg_timer** head, struct mg_timer*);
+	void mg_timer_poll(struct mg_timer** head, uint64_t new_ms);
+	bool mg_timer_expired(uint64_t* expiration, uint64_t period, uint64_t now);
 
 
 
-enum { MG_FS_READ = 1, MG_FS_WRITE = 2, MG_FS_DIR = 4 };
 
-// Filesystem API functions
-// st() returns MG_FS_* flags and populates file size and modification time
-// ls() calls fn() for every directory entry, allowing to list a directory
-//
-// NOTE: UNIX-style shorthand names for the API functions are deliberately
-// chosen to avoid conflicts with some libraries that make macros for e.g.
-// stat(), write(), read() calls.
-struct mg_fs {
-  int (*st)(const char *path, size_t *size, time_t *mtime);  // stat file
-  void (*ls)(const char *path, void (*fn)(const char *, void *),
-             void *);  // List directory entries: call fn(file_name, fn_data)
-                       // for each directory entry
-  void *(*op)(const char *path, int flags);             // Open file
-  void (*cl)(void *fd);                                 // Close file
-  size_t (*rd)(void *fd, void *buf, size_t len);        // Read file
-  size_t (*wr)(void *fd, const void *buf, size_t len);  // Write file
-  size_t (*sk)(void *fd, size_t offset);                // Set file position
-  bool (*mv)(const char *from, const char *to);         // Rename file
-  bool (*rm)(const char *path);                         // Delete file
-  bool (*mkd)(const char *path);                        // Create directory
-};
 
-extern struct mg_fs mg_fs_posix;   // POSIX open/close/read/write/seek
-extern struct mg_fs mg_fs_packed;  // Packed FS, see examples/device-dashboard
-extern struct mg_fs mg_fs_fat;     // FAT FS
+	enum { MG_FS_READ = 1, MG_FS_WRITE = 2, MG_FS_DIR = 4 };
 
-// File descriptor
-struct mg_fd {
-  void *fd;
-  struct mg_fs *fs;
-};
+	// Filesystem API functions
+	// st() returns MG_FS_* flags and populates file size and modification time
+	// ls() calls fn() for every directory entry, allowing to list a directory
+	//
+	// NOTE: UNIX-style shorthand names for the API functions are deliberately
+	// chosen to avoid conflicts with some libraries that make macros for e.g.
+	// stat(), write(), read() calls.
+	struct mg_fs
+	{
+		int (*st)(const char* path, size_t* size, time_t* mtime);  // stat file
+		void (*ls)(const char* path, void (*fn)(const char*, void*),
+				   void*);  // List directory entries: call fn(file_name, fn_data)
+		// for each directory entry
+		void* (*op)(const char* path, int flags);             // Open file
+		void (*cl)(void* fd);                                 // Close file
+		size_t(*rd)(void* fd, void* buf, size_t len);        // Read file
+		size_t(*wr)(void* fd, const void* buf, size_t len);  // Write file
+		size_t(*sk)(void* fd, size_t offset);                // Set file position
+		bool (*mv)(const char* from, const char* to);         // Rename file
+		bool (*rm)(const char* path);                         // Delete file
+		bool (*mkd)(const char* path);                        // Create directory
+	};
 
-struct mg_fd *mg_fs_open(struct mg_fs *fs, const char *path, int flags);
-void mg_fs_close(struct mg_fd *fd);
-char *mg_file_read(struct mg_fs *fs, const char *path, size_t *size);
-bool mg_file_write(struct mg_fs *fs, const char *path, const void *, size_t);
-bool mg_file_printf(struct mg_fs *fs, const char *path, const char *fmt, ...);
+	extern struct mg_fs mg_fs_posix;   // POSIX open/close/read/write/seek
+	extern struct mg_fs mg_fs_packed;  // Packed FS, see examples/device-dashboard
+	extern struct mg_fs mg_fs_fat;     // FAT FS
 
-// Packed API
-const char *mg_unpack(const char *path, size_t *size, time_t *mtime);
-const char *mg_unlist(size_t no);             // Get no'th packed filename
-struct mg_str mg_unpacked(const char *path);  // Packed file as mg_str
+	// File descriptor
+	struct mg_fd
+	{
+		void* fd;
+		struct mg_fs* fs;
+	};
+
+	struct mg_fd* mg_fs_open(struct mg_fs* fs, const char* path, int flags);
+	void mg_fs_close(struct mg_fd* fd);
+	char* mg_file_read(struct mg_fs* fs, const char* path, size_t* size);
+	bool mg_file_write(struct mg_fs* fs, const char* path, const void*, size_t);
+	bool mg_file_printf(struct mg_fs* fs, const char* path, const char* fmt, ...);
+
+	// Packed API
+	const char* mg_unpack(const char* path, size_t* size, time_t* mtime);
+	const char* mg_unlist(size_t no);             // Get no'th packed filename
+	struct mg_str mg_unpacked(const char* path);  // Packed file as mg_str
 
 
 
@@ -1045,14 +1060,14 @@ struct mg_str mg_unpacked(const char *path);  // Packed file as mg_str
 #define assert(x)
 #endif
 
-void mg_bzero(volatile unsigned char *buf, size_t len);
-void mg_random(void *buf, size_t len);
-char *mg_random_str(char *buf, size_t len);
-uint16_t mg_ntohs(uint16_t net);
-uint32_t mg_ntohl(uint32_t net);
-uint32_t mg_crc32(uint32_t crc, const char *buf, size_t len);
-uint64_t mg_millis(void);  // Return milliseconds since boot
-uint64_t mg_now(void);     // Return milliseconds since Epoch
+	void mg_bzero(volatile unsigned char* buf, size_t len);
+	void mg_random(void* buf, size_t len);
+	char* mg_random_str(char* buf, size_t len);
+	uint16_t mg_ntohs(uint16_t net);
+	uint32_t mg_ntohl(uint32_t net);
+	uint32_t mg_crc32(uint32_t crc, const char* buf, size_t len);
+	uint64_t mg_millis(void);  // Return milliseconds since boot
+	uint64_t mg_now(void);     // Return milliseconds since Epoch
 
 #define mg_htons(x) mg_ntohs(x)
 #define mg_htonl(x) mg_ntohl(x)
@@ -1061,7 +1076,7 @@ uint64_t mg_now(void);     // Return milliseconds since Epoch
   (((uint32_t) ((a) &255) << 24) | ((uint32_t) ((b) &255) << 16) | \
    ((uint32_t) ((c) &255) << 8) | (uint32_t) ((d) &255))
 
-// For printing IPv4 addresses: printf("%d.%d.%d.%d\n", MG_IPADDR_PARTS(&ip))
+	// For printing IPv4 addresses: printf("%d.%d.%d.%d\n", MG_IPADDR_PARTS(&ip))
 #define MG_U8P(ADDR) ((uint8_t *) (ADDR))
 #define MG_IPADDR_PARTS(ADDR) \
   MG_U8P(ADDR)[0], MG_U8P(ADDR)[1], MG_U8P(ADDR)[2], MG_U8P(ADDR)[3]
@@ -1093,10 +1108,10 @@ uint64_t mg_now(void);     // Return milliseconds since Epoch
 #define MG_DSB()
 #endif
 
-struct mg_addr;
-int mg_check_ip_acl(struct mg_str acl, struct mg_addr *remote_ip);
+	struct mg_addr;
+	int mg_check_ip_acl(struct mg_str acl, struct mg_addr* remote_ip);
 
-// Linked list management macros
+	// Linked list management macros
 #define LIST_ADD_HEAD(type_, head_, elem_) \
   do {                                     \
     (elem_)->next = (*head_);              \
@@ -1119,229 +1134,238 @@ int mg_check_ip_acl(struct mg_str acl, struct mg_addr *remote_ip);
 
 
 
-unsigned short mg_url_port(const char *url);
-int mg_url_is_ssl(const char *url);
-struct mg_str mg_url_host(const char *url);
-struct mg_str mg_url_user(const char *url);
-struct mg_str mg_url_pass(const char *url);
-const char *mg_url_uri(const char *url);
+	unsigned short mg_url_port(const char* url);
+	int mg_url_is_ssl(const char* url);
+	struct mg_str mg_url_host(const char* url);
+	struct mg_str mg_url_user(const char* url);
+	struct mg_str mg_url_pass(const char* url);
+	const char* mg_url_uri(const char* url);
 
 
 
 
-struct mg_iobuf {
-  unsigned char *buf;  // Pointer to stored data
-  size_t size;         // Total size available
-  size_t len;          // Current number of bytes
-  size_t align;        // Alignment during allocation
-};
+	struct mg_iobuf
+	{
+		unsigned char* buf;  // Pointer to stored data
+		size_t size;         // Total size available
+		size_t len;          // Current number of bytes
+		size_t align;        // Alignment during allocation
+	};
 
-int mg_iobuf_init(struct mg_iobuf *, size_t, size_t);
-int mg_iobuf_resize(struct mg_iobuf *, size_t);
-void mg_iobuf_free(struct mg_iobuf *);
-size_t mg_iobuf_add(struct mg_iobuf *, size_t, const void *, size_t);
-size_t mg_iobuf_del(struct mg_iobuf *, size_t ofs, size_t len);
-
-
-size_t mg_base64_update(unsigned char input_byte, char *buf, size_t len);
-size_t mg_base64_final(char *buf, size_t len);
-size_t mg_base64_encode(const unsigned char *p, size_t n, char *buf, size_t);
-size_t mg_base64_decode(const char *src, size_t n, char *dst, size_t);
+	int mg_iobuf_init(struct mg_iobuf*, size_t, size_t);
+	int mg_iobuf_resize(struct mg_iobuf*, size_t);
+	void mg_iobuf_free(struct mg_iobuf*);
+	size_t mg_iobuf_add(struct mg_iobuf*, size_t, const void*, size_t);
+	size_t mg_iobuf_del(struct mg_iobuf*, size_t ofs, size_t len);
 
 
-
-
-typedef struct {
-  uint32_t buf[4];
-  uint32_t bits[2];
-  unsigned char in[64];
-} mg_md5_ctx;
-
-void mg_md5_init(mg_md5_ctx *c);
-void mg_md5_update(mg_md5_ctx *c, const unsigned char *data, size_t len);
-void mg_md5_final(mg_md5_ctx *c, unsigned char[16]);
+	size_t mg_base64_update(unsigned char input_byte, char* buf, size_t len);
+	size_t mg_base64_final(char* buf, size_t len);
+	size_t mg_base64_encode(const unsigned char* p, size_t n, char* buf, size_t);
+	size_t mg_base64_decode(const char* src, size_t n, char* dst, size_t);
 
 
 
 
-typedef struct {
-  uint32_t state[5];
-  uint32_t count[2];
-  unsigned char buffer[64];
-} mg_sha1_ctx;
+	typedef struct
+	{
+		uint32_t buf[4];
+		uint32_t bits[2];
+		unsigned char in[64];
+	} mg_md5_ctx;
 
-void mg_sha1_init(mg_sha1_ctx *);
-void mg_sha1_update(mg_sha1_ctx *, const unsigned char *data, size_t len);
-void mg_sha1_final(unsigned char digest[20], mg_sha1_ctx *);
-
-
-struct mg_connection;
-typedef void (*mg_event_handler_t)(struct mg_connection *, int ev,
-                                   void *ev_data, void *fn_data);
-void mg_call(struct mg_connection *c, int ev, void *ev_data);
-void mg_error(struct mg_connection *c, const char *fmt, ...);
-
-enum {
-  MG_EV_ERROR,      // Error                        char *error_message
-  MG_EV_OPEN,       // Connection created           NULL
-  MG_EV_POLL,       // mg_mgr_poll iteration        uint64_t *uptime_millis
-  MG_EV_RESOLVE,    // Host name is resolved        NULL
-  MG_EV_CONNECT,    // Connection established       NULL
-  MG_EV_ACCEPT,     // Connection accepted          NULL
-  MG_EV_TLS_HS,     // TLS handshake succeeded      NULL
-  MG_EV_READ,       // Data received from socket    long *bytes_read
-  MG_EV_WRITE,      // Data written to socket       long *bytes_written
-  MG_EV_CLOSE,      // Connection closed            NULL
-  MG_EV_HTTP_MSG,   // HTTP request/response        struct mg_http_message *
-  MG_EV_WS_OPEN,    // Websocket handshake done     struct mg_http_message *
-  MG_EV_WS_MSG,     // Websocket msg, text or bin   struct mg_ws_message *
-  MG_EV_WS_CTL,     // Websocket control msg        struct mg_ws_message *
-  MG_EV_MQTT_CMD,   // MQTT low-level command       struct mg_mqtt_message *
-  MG_EV_MQTT_MSG,   // MQTT PUBLISH received        struct mg_mqtt_message *
-  MG_EV_MQTT_OPEN,  // MQTT CONNACK received        int *connack_status_code
-  MG_EV_SNTP_TIME,  // SNTP time received           uint64_t *epoch_millis
-  MG_EV_USER        // Starting ID for user events
-};
+	void mg_md5_init(mg_md5_ctx* c);
+	void mg_md5_update(mg_md5_ctx* c, const unsigned char* data, size_t len);
+	void mg_md5_final(mg_md5_ctx* c, unsigned char[16]);
 
 
 
 
+	typedef struct
+	{
+		uint32_t state[5];
+		uint32_t count[2];
+		unsigned char buffer[64];
+	} mg_sha1_ctx;
+
+	void mg_sha1_init(mg_sha1_ctx*);
+	void mg_sha1_update(mg_sha1_ctx*, const unsigned char* data, size_t len);
+	void mg_sha1_final(unsigned char digest[20], mg_sha1_ctx*);
+
+
+	struct mg_connection;
+	typedef void (*mg_event_handler_t)(struct mg_connection*, int ev,
+									   void* ev_data, void* fn_data);
+	void mg_call(struct mg_connection* c, int ev, void* ev_data);
+	void mg_error(struct mg_connection* c, const char* fmt, ...);
+
+	enum
+	{
+		MG_EV_ERROR,      // Error                        char *error_message
+		MG_EV_OPEN,       // Connection created           NULL
+		MG_EV_POLL,       // mg_mgr_poll iteration        uint64_t *uptime_millis
+		MG_EV_RESOLVE,    // Host name is resolved        NULL
+		MG_EV_CONNECT,    // Connection established       NULL
+		MG_EV_ACCEPT,     // Connection accepted          NULL
+		MG_EV_TLS_HS,     // TLS handshake succeeded      NULL
+		MG_EV_READ,       // Data received from socket    long *bytes_read
+		MG_EV_WRITE,      // Data written to socket       long *bytes_written
+		MG_EV_CLOSE,      // Connection closed            NULL
+		MG_EV_HTTP_MSG,   // HTTP request/response        struct mg_http_message *
+		MG_EV_WS_OPEN,    // Websocket handshake done     struct mg_http_message *
+		MG_EV_WS_MSG,     // Websocket msg, text or bin   struct mg_ws_message *
+		MG_EV_WS_CTL,     // Websocket control msg        struct mg_ws_message *
+		MG_EV_MQTT_CMD,   // MQTT low-level command       struct mg_mqtt_message *
+		MG_EV_MQTT_MSG,   // MQTT PUBLISH received        struct mg_mqtt_message *
+		MG_EV_MQTT_OPEN,  // MQTT CONNACK received        int *connack_status_code
+		MG_EV_SNTP_TIME,  // SNTP time received           uint64_t *epoch_millis
+		MG_EV_USER        // Starting ID for user events
+	};
 
 
 
 
 
-struct mg_dns {
-  const char *url;          // DNS server URL
-  struct mg_connection *c;  // DNS server connection
-};
 
-struct mg_addr {
-  uint8_t ip[16];    // Holds IPv4 or IPv6 address, in network byte order
-  uint16_t port;     // TCP or UDP port in network byte order
-  uint8_t scope_id;  // IPv6 scope ID
-  bool is_ip6;       // True when address is IPv6 address
-};
 
-struct mg_mgr {
-  struct mg_connection *conns;  // List of active connections
-  struct mg_dns dns4;           // DNS for IPv4
-  struct mg_dns dns6;           // DNS for IPv6
-  int dnstimeout;               // DNS resolve timeout in milliseconds
-  bool use_dns6;                // Use DNS6 server by default, see #1532
-  unsigned long nextid;         // Next connection ID
-  unsigned long timerid;        // Next timer ID
-  void *userdata;               // Arbitrary user data pointer
-  void *tls_ctx;                // TLS context shared by all TLS sessions
-  uint16_t mqtt_id;             // MQTT IDs for pub/sub
-  void *active_dns_requests;    // DNS requests in progress
-  struct mg_timer *timers;      // Active timers
-  int epoll_fd;                 // Used when MG_EPOLL_ENABLE=1
-  void *priv;                   // Used by the MIP stack
-  size_t extraconnsize;         // Used by the MIP stack
+
+
+	struct mg_dns
+	{
+		const char* url;          // DNS server URL
+		struct mg_connection* c;  // DNS server connection
+	};
+
+	struct mg_addr
+	{
+		uint8_t ip[16];    // Holds IPv4 or IPv6 address, in network byte order
+		uint16_t port;     // TCP or UDP port in network byte order
+		uint8_t scope_id;  // IPv6 scope ID
+		bool is_ip6;       // True when address is IPv6 address
+	};
+
+	struct mg_mgr
+	{
+		struct mg_connection* conns;  // List of active connections
+		struct mg_dns dns4;           // DNS for IPv4
+		struct mg_dns dns6;           // DNS for IPv6
+		int dnstimeout;               // DNS resolve timeout in milliseconds
+		bool use_dns6;                // Use DNS6 server by default, see #1532
+		unsigned long nextid;         // Next connection ID
+		unsigned long timerid;        // Next timer ID
+		void* userdata;               // Arbitrary user data pointer
+		void* tls_ctx;                // TLS context shared by all TLS sessions
+		uint16_t mqtt_id;             // MQTT IDs for pub/sub
+		void* active_dns_requests;    // DNS requests in progress
+		struct mg_timer* timers;      // Active timers
+		int epoll_fd;                 // Used when MG_EPOLL_ENABLE=1
+		void* priv;                   // Used by the MIP stack
+		size_t extraconnsize;         // Used by the MIP stack
 #if MG_ENABLE_FREERTOS_TCP
-  SocketSet_t ss;  // NOTE(lsm): referenced from socket struct
+		SocketSet_t ss;  // NOTE(lsm): referenced from socket struct
 #endif
-};
+	};
 
-struct mg_connection {
-  struct mg_connection *next;  // Linkage in struct mg_mgr :: connections
-  struct mg_mgr *mgr;          // Our container
-  struct mg_addr loc;          // Local address
-  struct mg_addr rem;          // Remote address
-  void *fd;                    // Connected socket, or LWIP data
-  unsigned long id;            // Auto-incrementing unique connection ID
-  struct mg_iobuf recv;        // Incoming data
-  struct mg_iobuf send;        // Outgoing data
-  struct mg_iobuf prof;        // Profile data enabled by MG_ENABLE_PROFILE
-  struct mg_iobuf rtls;        // TLS only. Incoming encrypted data
-  mg_event_handler_t fn;       // User-specified event handler function
-  void *fn_data;               // User-specified function parameter
-  mg_event_handler_t pfn;      // Protocol-specific handler function
-  void *pfn_data;              // Protocol-specific function parameter
-  char data[MG_DATA_SIZE];     // Arbitrary connection data
-  void *tls;                   // TLS specific data
-  unsigned is_listening : 1;   // Listening connection
-  unsigned is_client : 1;      // Outbound (client) connection
-  unsigned is_accepted : 1;    // Accepted (server) connection
-  unsigned is_resolving : 1;   // Non-blocking DNS resolution is in progress
-  unsigned is_arplooking : 1;  // Non-blocking ARP resolution is in progress
-  unsigned is_connecting : 1;  // Non-blocking connect is in progress
-  unsigned is_tls : 1;         // TLS-enabled connection
-  unsigned is_tls_hs : 1;      // TLS handshake is in progress
-  unsigned is_udp : 1;         // UDP connection
-  unsigned is_websocket : 1;   // WebSocket connection
-  unsigned is_mqtt5 : 1;       // For MQTT connection, v5 indicator
-  unsigned is_hexdumping : 1;  // Hexdump in/out traffic
-  unsigned is_draining : 1;    // Send remaining data, then close and free
-  unsigned is_closing : 1;     // Close and free the connection immediately
-  unsigned is_full : 1;        // Stop reads, until cleared
-  unsigned is_resp : 1;        // Response is still being generated
-  unsigned is_readable : 1;    // Connection is ready to read
-  unsigned is_writable : 1;    // Connection is ready to write
-};
+	struct mg_connection
+	{
+		struct mg_connection* next;  // Linkage in struct mg_mgr :: connections
+		struct mg_mgr* mgr;          // Our container
+		struct mg_addr loc;          // Local address
+		struct mg_addr rem;          // Remote address
+		void* fd;                    // Connected socket, or LWIP data
+		unsigned long id;            // Auto-incrementing unique connection ID
+		struct mg_iobuf recv;        // Incoming data
+		struct mg_iobuf send;        // Outgoing data
+		struct mg_iobuf prof;        // Profile data enabled by MG_ENABLE_PROFILE
+		struct mg_iobuf rtls;        // TLS only. Incoming encrypted data
+		mg_event_handler_t fn;       // User-specified event handler function
+		void* fn_data;               // User-specified function parameter
+		mg_event_handler_t pfn;      // Protocol-specific handler function
+		void* pfn_data;              // Protocol-specific function parameter
+		char data[MG_DATA_SIZE];     // Arbitrary connection data
+		void* tls;                   // TLS specific data
+		unsigned is_listening : 1;   // Listening connection
+		unsigned is_client : 1;      // Outbound (client) connection
+		unsigned is_accepted : 1;    // Accepted (server) connection
+		unsigned is_resolving : 1;   // Non-blocking DNS resolution is in progress
+		unsigned is_arplooking : 1;  // Non-blocking ARP resolution is in progress
+		unsigned is_connecting : 1;  // Non-blocking connect is in progress
+		unsigned is_tls : 1;         // TLS-enabled connection
+		unsigned is_tls_hs : 1;      // TLS handshake is in progress
+		unsigned is_udp : 1;         // UDP connection
+		unsigned is_websocket : 1;   // WebSocket connection
+		unsigned is_mqtt5 : 1;       // For MQTT connection, v5 indicator
+		unsigned is_hexdumping : 1;  // Hexdump in/out traffic
+		unsigned is_draining : 1;    // Send remaining data, then close and free
+		unsigned is_closing : 1;     // Close and free the connection immediately
+		unsigned is_full : 1;        // Stop reads, until cleared
+		unsigned is_resp : 1;        // Response is still being generated
+		unsigned is_readable : 1;    // Connection is ready to read
+		unsigned is_writable : 1;    // Connection is ready to write
+	};
 
-void mg_mgr_poll(struct mg_mgr *, int ms);
-void mg_mgr_init(struct mg_mgr *);
-void mg_mgr_free(struct mg_mgr *);
+	void mg_mgr_poll(struct mg_mgr*, int ms);
+	void mg_mgr_init(struct mg_mgr*);
+	void mg_mgr_free(struct mg_mgr*);
 
-struct mg_connection *mg_listen(struct mg_mgr *, const char *url,
-                                mg_event_handler_t fn, void *fn_data);
-struct mg_connection *mg_connect(struct mg_mgr *, const char *url,
-                                 mg_event_handler_t fn, void *fn_data);
-struct mg_connection *mg_wrapfd(struct mg_mgr *mgr, int fd,
-                                mg_event_handler_t fn, void *fn_data);
-void mg_connect_resolved(struct mg_connection *);
-bool mg_send(struct mg_connection *, const void *, size_t);
-size_t mg_printf(struct mg_connection *, const char *fmt, ...);
-size_t mg_vprintf(struct mg_connection *, const char *fmt, va_list *ap);
-bool mg_aton(struct mg_str str, struct mg_addr *addr);
+	struct mg_connection* mg_listen(struct mg_mgr*, const char* url,
+									mg_event_handler_t fn, void* fn_data);
+	struct mg_connection* mg_connect(struct mg_mgr*, const char* url,
+									 mg_event_handler_t fn, void* fn_data);
+	struct mg_connection* mg_wrapfd(struct mg_mgr* mgr, int fd,
+									mg_event_handler_t fn, void* fn_data);
+	void mg_connect_resolved(struct mg_connection*);
+	bool mg_send(struct mg_connection*, const void*, size_t);
+	size_t mg_printf(struct mg_connection*, const char* fmt, ...);
+	size_t mg_vprintf(struct mg_connection*, const char* fmt, va_list* ap);
+	bool mg_aton(struct mg_str str, struct mg_addr* addr);
 
-// These functions are used to integrate with custom network stacks
-struct mg_connection *mg_alloc_conn(struct mg_mgr *);
-void mg_close_conn(struct mg_connection *c);
-bool mg_open_listener(struct mg_connection *c, const char *url);
+	// These functions are used to integrate with custom network stacks
+	struct mg_connection* mg_alloc_conn(struct mg_mgr*);
+	void mg_close_conn(struct mg_connection* c);
+	bool mg_open_listener(struct mg_connection* c, const char* url);
 
-// Utility functions
-struct mg_timer *mg_timer_add(struct mg_mgr *mgr, uint64_t milliseconds,
-                              unsigned flags, void (*fn)(void *), void *arg);
+	// Utility functions
+	struct mg_timer* mg_timer_add(struct mg_mgr* mgr, uint64_t milliseconds,
+								  unsigned flags, void (*fn)(void*), void* arg);
 
 
 
-// Macros to record timestamped events that happens with a connection.
-// They are saved into a c->prof IO buffer, each event is a name and a 32-bit
-// timestamp in milliseconds since connection init time.
-//
-// Test (run in two separate terminals):
-//   make -C examples/http-server/ CFLAGS_EXTRA=-DMG_ENABLE_PROFILE=1
-//   curl localhost:8000
-// Output:
-//   1ea1f1e7 2 net.c:150:mg_close_conn      3 profile:                                                            
-//   1ea1f1e8 2 net.c:150:mg_close_conn      1ea1f1e6 init                                                         
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_OPEN
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_ACCEPT 
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_READ
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_HTTP_MSG
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_WRITE
-//   1ea1f1e8 2 net.c:150:mg_close_conn          1 EV_CLOSE
-//
-// Usage:
-//   Enable profiling by setting MG_ENABLE_PROFILE=1
-//   Invoke MG_PROF_ADD(c, "MY_EVENT_1") in the places you'd like to measure
+	// Macros to record timestamped events that happens with a connection.
+	// They are saved into a c->prof IO buffer, each event is a name and a 32-bit
+	// timestamp in milliseconds since connection init time.
+	//
+	// Test (run in two separate terminals):
+	//   make -C examples/http-server/ CFLAGS_EXTRA=-DMG_ENABLE_PROFILE=1
+	//   curl localhost:8000
+	// Output:
+	//   1ea1f1e7 2 net.c:150:mg_close_conn      3 profile:                                                            
+	//   1ea1f1e8 2 net.c:150:mg_close_conn      1ea1f1e6 init                                                         
+	//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_OPEN
+	//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_ACCEPT 
+	//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_READ
+	//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_HTTP_MSG
+	//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_WRITE
+	//   1ea1f1e8 2 net.c:150:mg_close_conn          1 EV_CLOSE
+	//
+	// Usage:
+	//   Enable profiling by setting MG_ENABLE_PROFILE=1
+	//   Invoke MG_PROF_ADD(c, "MY_EVENT_1") in the places you'd like to measure
 
 #if MG_ENABLE_PROFILE
-struct mg_profitem {
-  const char *name;    // Event name
-  uint32_t timestamp;  // Milliseconds since connection creation (MG_EV_OPEN)
-};
+	struct mg_profitem
+	{
+		const char* name;    // Event name
+		uint32_t timestamp;  // Milliseconds since connection creation (MG_EV_OPEN)
+	};
 
 #define MG_PROFILE_ALLOC_GRANULARITY 256  // Can save 32 items wih to realloc
 
-// Adding a profile item to the c->prof. Must be as fast as possible.
-// Reallocation of the c->prof iobuf is not desirable here, that's why we
-// pre-allocate c->prof with MG_PROFILE_ALLOC_GRANULARITY.
-// This macro just inits and copies 8 bytes, and calls mg_millis(),
-// which should be fast enough.
+	// Adding a profile item to the c->prof. Must be as fast as possible.
+	// Reallocation of the c->prof iobuf is not desirable here, that's why we
+	// pre-allocate c->prof with MG_PROFILE_ALLOC_GRANULARITY.
+	// This macro just inits and copies 8 bytes, and calls mg_millis(),
+	// which should be fast enough.
 #define MG_PROF_ADD(c, name_)                                             \
   do {                                                                    \
     struct mg_iobuf *io = &c->prof;                                       \
@@ -1387,69 +1411,73 @@ struct mg_profitem {
 
 
 
-struct mg_http_header {
-  struct mg_str name;   // Header name
-  struct mg_str value;  // Header value
-};
+	struct mg_http_header
+	{
+		struct mg_str name;   // Header name
+		struct mg_str value;  // Header value
+	};
 
-struct mg_http_message {
-  struct mg_str method, uri, query, proto;             // Request/response line
-  struct mg_http_header headers[MG_MAX_HTTP_HEADERS];  // Headers
-  struct mg_str body;                                  // Body
-  struct mg_str head;                                  // Request + headers
-  struct mg_str message;  // Request + headers + body
-};
+	struct mg_http_message
+	{
+		struct mg_str method, uri, query, proto;             // Request/response line
+		struct mg_http_header headers[MG_MAX_HTTP_HEADERS];  // Headers
+		struct mg_str body;                                  // Body
+		struct mg_str head;                                  // Request + headers
+		struct mg_str message;  // Request + headers + body
+	};
 
-// Parameter for mg_http_serve_dir()
-struct mg_http_serve_opts {
-  const char *root_dir;       // Web root directory, must be non-NULL
-  const char *ssi_pattern;    // SSI file name pattern, e.g. #.shtml
-  const char *extra_headers;  // Extra HTTP headers to add in responses
-  const char *mime_types;     // Extra mime types, ext1=type1,ext2=type2,..
-  const char *page404;        // Path to the 404 page, or NULL by default
-  struct mg_fs *fs;           // Filesystem implementation. Use NULL for POSIX
-};
+	// Parameter for mg_http_serve_dir()
+	struct mg_http_serve_opts
+	{
+		const char* root_dir;       // Web root directory, must be non-NULL
+		const char* ssi_pattern;    // SSI file name pattern, e.g. #.shtml
+		const char* extra_headers;  // Extra HTTP headers to add in responses
+		const char* mime_types;     // Extra mime types, ext1=type1,ext2=type2,..
+		const char* page404;        // Path to the 404 page, or NULL by default
+		struct mg_fs* fs;           // Filesystem implementation. Use NULL for POSIX
+	};
 
-// Parameter for mg_http_next_multipart
-struct mg_http_part {
-  struct mg_str name;      // Form field name
-  struct mg_str filename;  // Filename for file uploads
-  struct mg_str body;      // Part contents
-};
+	// Parameter for mg_http_next_multipart
+	struct mg_http_part
+	{
+		struct mg_str name;      // Form field name
+		struct mg_str filename;  // Filename for file uploads
+		struct mg_str body;      // Part contents
+	};
 
-int mg_http_parse(const char *s, size_t len, struct mg_http_message *);
-int mg_http_get_request_len(const unsigned char *buf, size_t buf_len);
-void mg_http_printf_chunk(struct mg_connection *cnn, const char *fmt, ...);
-void mg_http_write_chunk(struct mg_connection *c, const char *buf, size_t len);
-void mg_http_delete_chunk(struct mg_connection *c, struct mg_http_message *hm);
-struct mg_connection *mg_http_listen(struct mg_mgr *, const char *url,
-                                     mg_event_handler_t fn, void *fn_data);
-struct mg_connection *mg_http_connect(struct mg_mgr *, const char *url,
-                                      mg_event_handler_t fn, void *fn_data);
-void mg_http_serve_dir(struct mg_connection *, struct mg_http_message *hm,
-                       const struct mg_http_serve_opts *);
-void mg_http_serve_file(struct mg_connection *, struct mg_http_message *hm,
-                        const char *path, const struct mg_http_serve_opts *);
-void mg_http_reply(struct mg_connection *, int status_code, const char *headers,
-                   const char *body_fmt, ...);
-struct mg_str *mg_http_get_header(struct mg_http_message *, const char *name);
-struct mg_str mg_http_var(struct mg_str buf, struct mg_str name);
-int mg_http_get_var(const struct mg_str *, const char *name, char *, size_t);
-int mg_url_decode(const char *s, size_t n, char *to, size_t to_len, int form);
-size_t mg_url_encode(const char *s, size_t n, char *buf, size_t len);
-void mg_http_creds(struct mg_http_message *, char *, size_t, char *, size_t);
-bool mg_http_match_uri(const struct mg_http_message *, const char *glob);
-long mg_http_upload(struct mg_connection *c, struct mg_http_message *hm,
-                    struct mg_fs *fs, const char *path, size_t max_size);
-void mg_http_bauth(struct mg_connection *, const char *user, const char *pass);
-struct mg_str mg_http_get_header_var(struct mg_str s, struct mg_str v);
-size_t mg_http_next_multipart(struct mg_str, size_t, struct mg_http_part *);
-int mg_http_status(const struct mg_http_message *hm);
-void mg_hello(const char *url);
+	int mg_http_parse(const char* s, size_t len, struct mg_http_message*);
+	int mg_http_get_request_len(const unsigned char* buf, size_t buf_len);
+	void mg_http_printf_chunk(struct mg_connection* cnn, const char* fmt, ...);
+	void mg_http_write_chunk(struct mg_connection* c, const char* buf, size_t len);
+	void mg_http_delete_chunk(struct mg_connection* c, struct mg_http_message* hm);
+	struct mg_connection* mg_http_listen(struct mg_mgr*, const char* url,
+										 mg_event_handler_t fn, void* fn_data);
+	struct mg_connection* mg_http_connect(struct mg_mgr*, const char* url,
+										  mg_event_handler_t fn, void* fn_data);
+	void mg_http_serve_dir(struct mg_connection*, struct mg_http_message* hm,
+						   const struct mg_http_serve_opts*);
+	void mg_http_serve_file(struct mg_connection*, struct mg_http_message* hm,
+							const char* path, const struct mg_http_serve_opts*);
+	void mg_http_reply(struct mg_connection*, int status_code, const char* headers,
+					   const char* body_fmt, ...);
+	struct mg_str* mg_http_get_header(struct mg_http_message*, const char* name);
+	struct mg_str mg_http_var(struct mg_str buf, struct mg_str name);
+	int mg_http_get_var(const struct mg_str*, const char* name, char*, size_t);
+	int mg_url_decode(const char* s, size_t n, char* to, size_t to_len, int form);
+	size_t mg_url_encode(const char* s, size_t n, char* buf, size_t len);
+	void mg_http_creds(struct mg_http_message*, char*, size_t, char*, size_t);
+	bool mg_http_match_uri(const struct mg_http_message*, const char* glob);
+	long mg_http_upload(struct mg_connection* c, struct mg_http_message* hm,
+						struct mg_fs* fs, const char* path, size_t max_size);
+	void mg_http_bauth(struct mg_connection*, const char* user, const char* pass);
+	struct mg_str mg_http_get_header_var(struct mg_str s, struct mg_str v);
+	size_t mg_http_next_multipart(struct mg_str, size_t, struct mg_http_part*);
+	int mg_http_status(const struct mg_http_message* hm);
+	void mg_hello(const char* url);
 
 
-void mg_http_serve_ssi(struct mg_connection *c, const char *root,
-                       const char *fullpath);
+	void mg_http_serve_ssi(struct mg_connection* c, const char* root,
+						   const char* fullpath);
 
 
 #define MG_TLS_NONE 0     // No TLS support
@@ -1466,28 +1494,29 @@ void mg_http_serve_ssi(struct mg_connection *c, const char *root,
 
 
 
-struct mg_tls_opts {
-  struct mg_str ca;    // PEM or DER
-  struct mg_str cert;  // PEM or DER
-  struct mg_str key;   // PEM or DER
-  struct mg_str name;  // If not empty, enable host name verification
-};
+	struct mg_tls_opts
+	{
+		struct mg_str ca;    // PEM or DER
+		struct mg_str cert;  // PEM or DER
+		struct mg_str key;   // PEM or DER
+		struct mg_str name;  // If not empty, enable host name verification
+	};
 
-void mg_tls_init(struct mg_connection *, const struct mg_tls_opts *opts);
-void mg_tls_free(struct mg_connection *);
-long mg_tls_send(struct mg_connection *, const void *buf, size_t len);
-long mg_tls_recv(struct mg_connection *, void *buf, size_t len);
-size_t mg_tls_pending(struct mg_connection *);
-void mg_tls_handshake(struct mg_connection *);
+	void mg_tls_init(struct mg_connection*, const struct mg_tls_opts* opts);
+	void mg_tls_free(struct mg_connection*);
+	long mg_tls_send(struct mg_connection*, const void* buf, size_t len);
+	long mg_tls_recv(struct mg_connection*, void* buf, size_t len);
+	size_t mg_tls_pending(struct mg_connection*);
+	void mg_tls_handshake(struct mg_connection*);
 
-// Private
-void mg_tls_ctx_init(struct mg_mgr *);
-void mg_tls_ctx_free(struct mg_mgr *);
+	// Private
+	void mg_tls_ctx_init(struct mg_mgr*);
+	void mg_tls_ctx_free(struct mg_mgr*);
 
-// Low-level IO primives used by TLS layer
-enum { MG_IO_ERR = -1, MG_IO_WAIT = -2, MG_IO_RESET = -3 };
-long mg_io_send(struct mg_connection *c, const void *buf, size_t len);
-long mg_io_recv(struct mg_connection *c, void *buf, size_t len);
+	// Low-level IO primives used by TLS layer
+	enum { MG_IO_ERR = -1, MG_IO_WAIT = -2, MG_IO_RESET = -3 };
+	long mg_io_send(struct mg_connection* c, const void* buf, size_t len);
+	long mg_io_recv(struct mg_connection* c, void* buf, size_t len);
 
 
 
@@ -1501,23 +1530,25 @@ long mg_io_recv(struct mg_connection *c, void *buf, size_t len);
 #include <mbedtls/ssl.h>
 #include <mbedtls/ssl_ticket.h>
 
-struct mg_tls_ctx {
-  int dummy;
+	struct mg_tls_ctx
+	{
+		int dummy;
 #ifdef MBEDTLS_SSL_SESSION_TICKETS
-  mbedtls_ssl_ticket_context tickets;
+		mbedtls_ssl_ticket_context tickets;
 #endif
-};
+	};
 
-struct mg_tls {
-  mbedtls_x509_crt ca;      // Parsed CA certificate
-  mbedtls_x509_crt cert;    // Parsed certificate
-  mbedtls_pk_context pk;    // Private key context
-  mbedtls_ssl_context ssl;  // SSL/TLS context
-  mbedtls_ssl_config conf;  // SSL-TLS config
+	struct mg_tls
+	{
+		mbedtls_x509_crt ca;      // Parsed CA certificate
+		mbedtls_x509_crt cert;    // Parsed certificate
+		mbedtls_pk_context pk;    // Private key context
+		mbedtls_ssl_context ssl;  // SSL/TLS context
+		mbedtls_ssl_config conf;  // SSL-TLS config
 #ifdef MBEDTLS_SSL_SESSION_TICKETS
-  mbedtls_ssl_ticket_context ticket;  // Session tickets context
+		mbedtls_ssl_ticket_context ticket;  // Session tickets context
 #endif
-};
+	};
 #endif
 
 
@@ -1526,11 +1557,12 @@ struct mg_tls {
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 
-struct mg_tls {
-  BIO_METHOD *bm;
-  SSL_CTX *ctx;
-  SSL *ssl;
-};
+	struct mg_tls
+	{
+		BIO_METHOD* bm;
+		SSL_CTX* ctx;
+		SSL* ssl;
+	};
 #endif
 
 
@@ -1543,29 +1575,30 @@ struct mg_tls {
 
 
 
-struct mg_ws_message {
-  struct mg_str data;  // Websocket message data
-  uint8_t flags;       // Websocket message flags
-};
+	struct mg_ws_message
+	{
+		struct mg_str data;  // Websocket message data
+		uint8_t flags;       // Websocket message flags
+	};
 
-struct mg_connection *mg_ws_connect(struct mg_mgr *, const char *url,
-                                    mg_event_handler_t fn, void *fn_data,
-                                    const char *fmt, ...);
-void mg_ws_upgrade(struct mg_connection *, struct mg_http_message *,
-                   const char *fmt, ...);
-size_t mg_ws_send(struct mg_connection *, const void *buf, size_t len, int op);
-size_t mg_ws_wrap(struct mg_connection *, size_t len, int op);
-size_t mg_ws_printf(struct mg_connection *c, int op, const char *fmt, ...);
-size_t mg_ws_vprintf(struct mg_connection *c, int op, const char *fmt,
-                     va_list *);
+	struct mg_connection* mg_ws_connect(struct mg_mgr*, const char* url,
+										mg_event_handler_t fn, void* fn_data,
+										const char* fmt, ...);
+	void mg_ws_upgrade(struct mg_connection*, struct mg_http_message*,
+					   const char* fmt, ...);
+	size_t mg_ws_send(struct mg_connection*, const void* buf, size_t len, int op);
+	size_t mg_ws_wrap(struct mg_connection*, size_t len, int op);
+	size_t mg_ws_printf(struct mg_connection* c, int op, const char* fmt, ...);
+	size_t mg_ws_vprintf(struct mg_connection* c, int op, const char* fmt,
+						 va_list*);
 
 
 
 
-struct mg_connection *mg_sntp_connect(struct mg_mgr *mgr, const char *url,
-                                      mg_event_handler_t fn, void *fn_data);
-void mg_sntp_request(struct mg_connection *c);
-int64_t mg_sntp_parse(const unsigned char *buf, size_t len);
+	struct mg_connection* mg_sntp_connect(struct mg_mgr* mgr, const char* url,
+										  mg_event_handler_t fn, void* fn_data);
+	void mg_sntp_request(struct mg_connection* c);
+	int64_t mg_sntp_parse(const unsigned char* buf, size_t len);
 
 
 
@@ -1615,108 +1648,115 @@ int64_t mg_sntp_parse(const unsigned char *buf, size_t len);
 #define MQTT_PROP_SUBSCRIPTION_IDENTIFIER_AVAILABLE 0x29
 #define MQTT_PROP_SHARED_SUBSCRIPTION_AVAILABLE 0x2A
 
-enum {
-  MQTT_PROP_TYPE_BYTE,
-  MQTT_PROP_TYPE_STRING,
-  MQTT_PROP_TYPE_STRING_PAIR,
-  MQTT_PROP_TYPE_BINARY_DATA,
-  MQTT_PROP_TYPE_VARIABLE_INT,
-  MQTT_PROP_TYPE_INT,
-  MQTT_PROP_TYPE_SHORT
-};
+	enum
+	{
+		MQTT_PROP_TYPE_BYTE,
+		MQTT_PROP_TYPE_STRING,
+		MQTT_PROP_TYPE_STRING_PAIR,
+		MQTT_PROP_TYPE_BINARY_DATA,
+		MQTT_PROP_TYPE_VARIABLE_INT,
+		MQTT_PROP_TYPE_INT,
+		MQTT_PROP_TYPE_SHORT
+	};
 
-enum { MQTT_OK, MQTT_INCOMPLETE, MQTT_MALFORMED };
+	enum { MQTT_OK, MQTT_INCOMPLETE, MQTT_MALFORMED };
 
-struct mg_mqtt_prop {
-  uint8_t id;         // Enumerated at MQTT5 Reference
-  uint32_t iv;        // Integer value for 8-, 16-, 32-bit integers types
-  struct mg_str key;  // Non-NULL only for user property type
-  struct mg_str val;  // Non-NULL only for UTF-8 types and user properties
-};
+	struct mg_mqtt_prop
+	{
+		uint8_t id;         // Enumerated at MQTT5 Reference
+		uint32_t iv;        // Integer value for 8-, 16-, 32-bit integers types
+		struct mg_str key;  // Non-NULL only for user property type
+		struct mg_str val;  // Non-NULL only for UTF-8 types and user properties
+	};
 
-struct mg_mqtt_opts {
-  struct mg_str user;               // Username, can be empty
-  struct mg_str pass;               // Password, can be empty
-  struct mg_str client_id;          // Client ID
-  struct mg_str topic;              // message/subscription topic
-  struct mg_str message;            // message content
-  uint8_t qos;                      // message quality of service
-  uint8_t version;                  // Can be 4 (3.1.1), or 5. If 0, assume 4
-  uint16_t keepalive;               // Keep-alive timer in seconds
-  bool retain;                      // Retain flag
-  bool clean;                       // Clean session flag
-  struct mg_mqtt_prop *props;       // MQTT5 props array
-  size_t num_props;                 // number of props
-  struct mg_mqtt_prop *will_props;  // Valid only for CONNECT packet (MQTT5)
-  size_t num_will_props;            // Number of will props
-};
+	struct mg_mqtt_opts
+	{
+		struct mg_str user;               // Username, can be empty
+		struct mg_str pass;               // Password, can be empty
+		struct mg_str client_id;          // Client ID
+		struct mg_str topic;              // message/subscription topic
+		struct mg_str message;            // message content
+		uint8_t qos;                      // message quality of service
+		uint8_t version;                  // Can be 4 (3.1.1), or 5. If 0, assume 4
+		uint16_t keepalive;               // Keep-alive timer in seconds
+		bool retain;                      // Retain flag
+		bool clean;                       // Clean session flag
+		struct mg_mqtt_prop* props;       // MQTT5 props array
+		size_t num_props;                 // number of props
+		struct mg_mqtt_prop* will_props;  // Valid only for CONNECT packet (MQTT5)
+		size_t num_will_props;            // Number of will props
+	};
 
-struct mg_mqtt_message {
-  struct mg_str topic;  // Parsed topic for PUBLISH
-  struct mg_str data;   // Parsed message for PUBLISH
-  struct mg_str dgram;  // Whole MQTT packet, including headers
-  uint16_t id;          // For PUBACK, PUBREC, PUBREL, PUBCOMP, SUBACK, PUBLISH
-  uint8_t cmd;          // MQTT command, one of MQTT_CMD_*
-  uint8_t qos;          // Quality of service
-  uint8_t ack;          // CONNACK return code, 0 = success
-  size_t props_start;   // Offset to the start of the properties (MQTT5)
-  size_t props_size;    // Length of the properties
-};
+	struct mg_mqtt_message
+	{
+		struct mg_str topic;  // Parsed topic for PUBLISH
+		struct mg_str data;   // Parsed message for PUBLISH
+		struct mg_str dgram;  // Whole MQTT packet, including headers
+		uint16_t id;          // For PUBACK, PUBREC, PUBREL, PUBCOMP, SUBACK, PUBLISH
+		uint8_t cmd;          // MQTT command, one of MQTT_CMD_*
+		uint8_t qos;          // Quality of service
+		uint8_t ack;          // CONNACK return code, 0 = success
+		size_t props_start;   // Offset to the start of the properties (MQTT5)
+		size_t props_size;    // Length of the properties
+	};
 
-struct mg_connection *mg_mqtt_connect(struct mg_mgr *, const char *url,
-                                      const struct mg_mqtt_opts *opts,
-                                      mg_event_handler_t fn, void *fn_data);
-struct mg_connection *mg_mqtt_listen(struct mg_mgr *mgr, const char *url,
-                                     mg_event_handler_t fn, void *fn_data);
-void mg_mqtt_login(struct mg_connection *c, const struct mg_mqtt_opts *opts);
-void mg_mqtt_pub(struct mg_connection *c, const struct mg_mqtt_opts *opts);
-void mg_mqtt_sub(struct mg_connection *, const struct mg_mqtt_opts *opts);
-int mg_mqtt_parse(const uint8_t *, size_t, uint8_t, struct mg_mqtt_message *);
-void mg_mqtt_send_header(struct mg_connection *, uint8_t cmd, uint8_t flags,
-                         uint32_t len);
-void mg_mqtt_ping(struct mg_connection *);
-void mg_mqtt_pong(struct mg_connection *);
-void mg_mqtt_disconnect(struct mg_connection *, const struct mg_mqtt_opts *);
-size_t mg_mqtt_next_prop(struct mg_mqtt_message *, struct mg_mqtt_prop *,
-                         size_t ofs);
-
-
-
+	struct mg_connection* mg_mqtt_connect(struct mg_mgr*, const char* url,
+										  const struct mg_mqtt_opts* opts,
+										  mg_event_handler_t fn, void* fn_data);
+	struct mg_connection* mg_mqtt_listen(struct mg_mgr* mgr, const char* url,
+										 mg_event_handler_t fn, void* fn_data);
+	void mg_mqtt_login(struct mg_connection* c, const struct mg_mqtt_opts* opts);
+	void mg_mqtt_pub(struct mg_connection* c, const struct mg_mqtt_opts* opts);
+	void mg_mqtt_sub(struct mg_connection*, const struct mg_mqtt_opts* opts);
+	int mg_mqtt_parse(const uint8_t*, size_t, uint8_t, struct mg_mqtt_message*);
+	void mg_mqtt_send_header(struct mg_connection*, uint8_t cmd, uint8_t flags,
+							 uint32_t len);
+	void mg_mqtt_ping(struct mg_connection*);
+	void mg_mqtt_pong(struct mg_connection*);
+	void mg_mqtt_disconnect(struct mg_connection*, const struct mg_mqtt_opts*);
+	size_t mg_mqtt_next_prop(struct mg_mqtt_message*, struct mg_mqtt_prop*,
+							 size_t ofs);
 
 
-// Mongoose sends DNS queries that contain only one question:
-// either A (IPv4) or AAAA (IPv6) address lookup.
-// Therefore, we expect zero or one answer.
-// If `resolved` is true, then `addr` contains resolved IPv4 or IPV6 address.
-struct mg_dns_message {
-  uint16_t txnid;       // Transaction ID
-  bool resolved;        // Resolve successful, addr is set
-  struct mg_addr addr;  // Resolved address
-  char name[256];       // Host name
-};
 
-struct mg_dns_header {
-  uint16_t txnid;  // Transaction ID
-  uint16_t flags;
-  uint16_t num_questions;
-  uint16_t num_answers;
-  uint16_t num_authority_prs;
-  uint16_t num_other_prs;
-};
 
-// DNS resource record
-struct mg_dns_rr {
-  uint16_t nlen;    // Name or pointer length
-  uint16_t atype;   // Address type
-  uint16_t aclass;  // Address class
-  uint16_t alen;    // Address length
-};
 
-void mg_resolve(struct mg_connection *, const char *url);
-void mg_resolve_cancel(struct mg_connection *);
-bool mg_dns_parse(const uint8_t *buf, size_t len, struct mg_dns_message *);
-size_t mg_dns_parse_rr(const uint8_t *buf, size_t len, size_t ofs,
-                       bool is_question, struct mg_dns_rr *);
+	// Mongoose sends DNS queries that contain only one question:
+	// either A (IPv4) or AAAA (IPv6) address lookup.
+	// Therefore, we expect zero or one answer.
+	// If `resolved` is true, then `addr` contains resolved IPv4 or IPV6 address.
+	struct mg_dns_message
+	{
+		uint16_t txnid;       // Transaction ID
+		bool resolved;        // Resolve successful, addr is set
+		struct mg_addr addr;  // Resolved address
+		char name[256];       // Host name
+	};
+
+	struct mg_dns_header
+	{
+		uint16_t txnid;  // Transaction ID
+		uint16_t flags;
+		uint16_t num_questions;
+		uint16_t num_answers;
+		uint16_t num_authority_prs;
+		uint16_t num_other_prs;
+	};
+
+	// DNS resource record
+	struct mg_dns_rr
+	{
+		uint16_t nlen;    // Name or pointer length
+		uint16_t atype;   // Address type
+		uint16_t aclass;  // Address class
+		uint16_t alen;    // Address length
+	};
+
+	void mg_resolve(struct mg_connection*, const char* url);
+	void mg_resolve_cancel(struct mg_connection*);
+	bool mg_dns_parse(const uint8_t* buf, size_t len, struct mg_dns_message*);
+	size_t mg_dns_parse_rr(const uint8_t* buf, size_t len, size_t ofs,
+						   bool is_question, struct mg_dns_rr*);
 
 
 
@@ -1726,55 +1766,57 @@ size_t mg_dns_parse_rr(const uint8_t *buf, size_t len, size_t ofs,
 #define MG_JSON_MAX_DEPTH 30
 #endif
 
-// Error return values - negative. Successful returns are >= 0
-enum { MG_JSON_TOO_DEEP = -1, MG_JSON_INVALID = -2, MG_JSON_NOT_FOUND = -3 };
-int mg_json_get(struct mg_str json, const char *path, int *toklen);
+	// Error return values - negative. Successful returns are >= 0
+	enum { MG_JSON_TOO_DEEP = -1, MG_JSON_INVALID = -2, MG_JSON_NOT_FOUND = -3 };
+	int mg_json_get(struct mg_str json, const char* path, int* toklen);
 
-bool mg_json_get_num(struct mg_str json, const char *path, double *v);
-bool mg_json_get_bool(struct mg_str json, const char *path, bool *v);
-long mg_json_get_long(struct mg_str json, const char *path, long dflt);
-char *mg_json_get_str(struct mg_str json, const char *path);
-char *mg_json_get_hex(struct mg_str json, const char *path, int *len);
-char *mg_json_get_b64(struct mg_str json, const char *path, int *len);
+	bool mg_json_get_num(struct mg_str json, const char* path, double* v);
+	bool mg_json_get_bool(struct mg_str json, const char* path, bool* v);
+	long mg_json_get_long(struct mg_str json, const char* path, long dflt);
+	char* mg_json_get_str(struct mg_str json, const char* path);
+	char* mg_json_get_hex(struct mg_str json, const char* path, int* len);
+	char* mg_json_get_b64(struct mg_str json, const char* path, int* len);
 
-bool mg_json_unescape(struct mg_str str, char *buf, size_t len);
-size_t mg_json_next(struct mg_str obj, size_t ofs, struct mg_str *key,
-                    struct mg_str *val);
-
-
+	bool mg_json_unescape(struct mg_str str, char* buf, size_t len);
+	size_t mg_json_next(struct mg_str obj, size_t ofs, struct mg_str* key,
+						struct mg_str* val);
 
 
-// JSON-RPC request descriptor
-struct mg_rpc_req {
-  struct mg_rpc **head;  // RPC handlers list head
-  struct mg_rpc *rpc;    // RPC handler being called
-  mg_pfn_t pfn;          // Response printing function
-  void *pfn_data;        // Response printing function data
-  void *req_data;        // Arbitrary request data
-  struct mg_str frame;   // Request, e.g. {"id":1,"method":"add","params":[1,2]}
-};
 
-// JSON-RPC method handler
-struct mg_rpc {
-  struct mg_rpc *next;              // Next in list
-  struct mg_str method;             // Method pattern
-  void (*fn)(struct mg_rpc_req *);  // Handler function
-  void *fn_data;                    // Handler function argument
-};
 
-void mg_rpc_add(struct mg_rpc **head, struct mg_str method_pattern,
-                void (*handler)(struct mg_rpc_req *), void *handler_data);
-void mg_rpc_del(struct mg_rpc **head, void (*handler)(struct mg_rpc_req *));
-void mg_rpc_process(struct mg_rpc_req *);
+	// JSON-RPC request descriptor
+	struct mg_rpc_req
+	{
+		struct mg_rpc** head;  // RPC handlers list head
+		struct mg_rpc* rpc;    // RPC handler being called
+		mg_pfn_t pfn;          // Response printing function
+		void* pfn_data;        // Response printing function data
+		void* req_data;        // Arbitrary request data
+		struct mg_str frame;   // Request, e.g. {"id":1,"method":"add","params":[1,2]}
+	};
 
-// Helper functions to print result or error frame
-void mg_rpc_ok(struct mg_rpc_req *, const char *fmt, ...);
-void mg_rpc_vok(struct mg_rpc_req *, const char *fmt, va_list *ap);
-void mg_rpc_err(struct mg_rpc_req *, int code, const char *fmt, ...);
-void mg_rpc_verr(struct mg_rpc_req *, int code, const char *fmt, va_list *);
-void mg_rpc_list(struct mg_rpc_req *r);
-// Copyright (c) 2023 Cesanta Software Limited
-// All rights reserved
+	// JSON-RPC method handler
+	struct mg_rpc
+	{
+		struct mg_rpc* next;              // Next in list
+		struct mg_str method;             // Method pattern
+		void (*fn)(struct mg_rpc_req*);  // Handler function
+		void* fn_data;                    // Handler function argument
+	};
+
+	void mg_rpc_add(struct mg_rpc** head, struct mg_str method_pattern,
+					void (*handler)(struct mg_rpc_req*), void* handler_data);
+	void mg_rpc_del(struct mg_rpc** head, void (*handler)(struct mg_rpc_req*));
+	void mg_rpc_process(struct mg_rpc_req*);
+
+	// Helper functions to print result or error frame
+	void mg_rpc_ok(struct mg_rpc_req*, const char* fmt, ...);
+	void mg_rpc_vok(struct mg_rpc_req*, const char* fmt, va_list* ap);
+	void mg_rpc_err(struct mg_rpc_req*, int code, const char* fmt, ...);
+	void mg_rpc_verr(struct mg_rpc_req*, int code, const char* fmt, va_list*);
+	void mg_rpc_list(struct mg_rpc_req* r);
+	// Copyright (c) 2023 Cesanta Software Limited
+	// All rights reserved
 
 
 
@@ -1795,28 +1837,29 @@ void mg_rpc_list(struct mg_rpc_req *r);
 #endif
 
 // Firmware update API
-bool mg_ota_begin(size_t new_firmware_size);     // Start writing
-bool mg_ota_write(const void *buf, size_t len);  // Write chunk, aligned to 1k
-bool mg_ota_end(void);                           // Stop writing
+	bool mg_ota_begin(size_t new_firmware_size);     // Start writing
+	bool mg_ota_write(const void* buf, size_t len);  // Write chunk, aligned to 1k
+	bool mg_ota_end(void);                           // Stop writing
 
-enum {
-  MG_OTA_UNAVAILABLE = 0,  // No OTA information is present
-  MG_OTA_FIRST_BOOT = 1,   // Device booting the first time after the OTA
-  MG_OTA_UNCOMMITTED = 2,  // Ditto, but marking us for the rollback
-  MG_OTA_COMMITTED = 3,    // The firmware is good
-};
-enum { MG_FIRMWARE_CURRENT = 0, MG_FIRMWARE_PREVIOUS = 1 };
+	enum
+	{
+		MG_OTA_UNAVAILABLE = 0,  // No OTA information is present
+		MG_OTA_FIRST_BOOT = 1,   // Device booting the first time after the OTA
+		MG_OTA_UNCOMMITTED = 2,  // Ditto, but marking us for the rollback
+		MG_OTA_COMMITTED = 3,    // The firmware is good
+	};
+	enum { MG_FIRMWARE_CURRENT = 0, MG_FIRMWARE_PREVIOUS = 1 };
 
-int mg_ota_status(int firmware);          // Return firmware status MG_OTA_*
-uint32_t mg_ota_crc32(int firmware);      // Return firmware checksum
-uint32_t mg_ota_timestamp(int firmware);  // Firmware timestamp, UNIX UTC epoch
-size_t mg_ota_size(int firmware);         // Firmware size
+	int mg_ota_status(int firmware);          // Return firmware status MG_OTA_*
+	uint32_t mg_ota_crc32(int firmware);      // Return firmware checksum
+	uint32_t mg_ota_timestamp(int firmware);  // Firmware timestamp, UNIX UTC epoch
+	size_t mg_ota_size(int firmware);         // Firmware size
 
-bool mg_ota_commit(void);        // Commit current firmware
-bool mg_ota_rollback(void);      // Rollback to the previous firmware
-MG_IRAM void mg_ota_boot(void);  // Bootloader function
-// Copyright (c) 2023 Cesanta Software Limited
-// All rights reserved
+	bool mg_ota_commit(void);        // Commit current firmware
+	bool mg_ota_rollback(void);      // Rollback to the previous firmware
+	MG_IRAM void mg_ota_boot(void);  // Bootloader function
+	// Copyright (c) 2023 Cesanta Software Limited
+	// All rights reserved
 
 
 
@@ -1833,23 +1876,23 @@ MG_IRAM void mg_ota_boot(void);  // Bootloader function
 #endif
 
 // Flash information
-void *mg_flash_start(void);         // Return flash start address
-size_t mg_flash_size(void);         // Return flash size
-size_t mg_flash_sector_size(void);  // Return flash sector size
-size_t mg_flash_write_align(void);  // Return flash write align, minimum 4
-int mg_flash_bank(void);            // 0: not dual bank, 1: bank1, 2: bank2
+	void* mg_flash_start(void);         // Return flash start address
+	size_t mg_flash_size(void);         // Return flash size
+	size_t mg_flash_sector_size(void);  // Return flash sector size
+	size_t mg_flash_write_align(void);  // Return flash write align, minimum 4
+	int mg_flash_bank(void);            // 0: not dual bank, 1: bank1, 2: bank2
 
-// Write, erase, swap bank
-bool mg_flash_write(void *addr, const void *buf, size_t len);
-bool mg_flash_erase(void *sector);
-bool mg_flash_swap_bank(void);
+	// Write, erase, swap bank
+	bool mg_flash_write(void* addr, const void* buf, size_t len);
+	bool mg_flash_erase(void* sector);
+	bool mg_flash_swap_bank(void);
 
-// Convenience functions to store data on a flash sector with wear levelling
-// If `sector` is NULL, then the last sector of flash is used
-bool mg_flash_load(void *sector, uint32_t key, void *buf, size_t len);
-bool mg_flash_save(void *sector, uint32_t key, const void *buf, size_t len);
+	// Convenience functions to store data on a flash sector with wear levelling
+	// If `sector` is NULL, then the last sector of flash is used
+	bool mg_flash_load(void* sector, uint32_t key, void* buf, size_t len);
+	bool mg_flash_save(void* sector, uint32_t key, const void* buf, size_t len);
 
-void mg_device_reset(void);  // Reboot device immediately
+	void mg_device_reset(void);  // Reboot device immediately
 
 
 
@@ -1857,68 +1900,71 @@ void mg_device_reset(void);  // Reboot device immediately
 
 
 #if defined(MG_ENABLE_TCPIP) && MG_ENABLE_TCPIP
-struct mg_tcpip_if;  // Mongoose TCP/IP network interface
+	struct mg_tcpip_if;  // Mongoose TCP/IP network interface
 
-struct mg_tcpip_driver {
-  bool (*init)(struct mg_tcpip_if *);                         // Init driver
-  size_t (*tx)(const void *, size_t, struct mg_tcpip_if *);   // Transmit frame
-  size_t (*rx)(void *buf, size_t len, struct mg_tcpip_if *);  // Receive frame
-  bool (*up)(struct mg_tcpip_if *);                           // Up/down status
-};
+	struct mg_tcpip_driver
+	{
+		bool (*init)(struct mg_tcpip_if*);                         // Init driver
+		size_t(*tx)(const void*, size_t, struct mg_tcpip_if*);   // Transmit frame
+		size_t(*rx)(void* buf, size_t len, struct mg_tcpip_if*);  // Receive frame
+		bool (*up)(struct mg_tcpip_if*);                           // Up/down status
+	};
 
-// Network interface
-struct mg_tcpip_if {
-  uint8_t mac[6];                  // MAC address. Must be set to a valid MAC
-  uint32_t ip, mask, gw;           // IP address, mask, default gateway
-  struct mg_str tx;                // Output (TX) buffer
-  bool enable_dhcp_client;         // Enable DCHP client
-  bool enable_dhcp_server;         // Enable DCHP server
-  bool enable_get_gateway;         // DCHP server sets client as gateway
-  bool enable_crc32_check;         // Do a CRC check on RX frames and strip it
-  bool enable_mac_check;           // Do a MAC check on RX frames
-  struct mg_tcpip_driver *driver;  // Low level driver
-  void *driver_data;               // Driver-specific data
-  struct mg_mgr *mgr;              // Mongoose event manager
-  struct mg_queue recv_queue;      // Receive queue
-  uint16_t mtu;                    // Interface MTU
+	// Network interface
+	struct mg_tcpip_if
+	{
+		uint8_t mac[6];                  // MAC address. Must be set to a valid MAC
+		uint32_t ip, mask, gw;           // IP address, mask, default gateway
+		struct mg_str tx;                // Output (TX) buffer
+		bool enable_dhcp_client;         // Enable DCHP client
+		bool enable_dhcp_server;         // Enable DCHP server
+		bool enable_get_gateway;         // DCHP server sets client as gateway
+		bool enable_crc32_check;         // Do a CRC check on RX frames and strip it
+		bool enable_mac_check;           // Do a MAC check on RX frames
+		struct mg_tcpip_driver* driver;  // Low level driver
+		void* driver_data;               // Driver-specific data
+		struct mg_mgr* mgr;              // Mongoose event manager
+		struct mg_queue recv_queue;      // Receive queue
+		uint16_t mtu;                    // Interface MTU
 #define MG_TCPIP_MTU_DEFAULT 1500
 
-  // Internal state, user can use it but should not change it
-  uint8_t gwmac[6];             // Router's MAC
-  uint64_t now;                 // Current time
-  uint64_t timer_1000ms;        // 1000 ms timer: for DHCP and link state
-  uint64_t lease_expire;        // Lease expiration time, in ms
-  uint16_t eport;               // Next ephemeral port
-  volatile uint32_t ndrop;      // Number of received, but dropped frames
-  volatile uint32_t nrecv;      // Number of received frames
-  volatile uint32_t nsent;      // Number of transmitted frames
-  volatile uint32_t nerr;       // Number of driver errors
-  uint8_t state;                // Current state
+		// Internal state, user can use it but should not change it
+		uint8_t gwmac[6];             // Router's MAC
+		uint64_t now;                 // Current time
+		uint64_t timer_1000ms;        // 1000 ms timer: for DHCP and link state
+		uint64_t lease_expire;        // Lease expiration time, in ms
+		uint16_t eport;               // Next ephemeral port
+		volatile uint32_t ndrop;      // Number of received, but dropped frames
+		volatile uint32_t nrecv;      // Number of received frames
+		volatile uint32_t nsent;      // Number of transmitted frames
+		volatile uint32_t nerr;       // Number of driver errors
+		uint8_t state;                // Current state
 #define MG_TCPIP_STATE_DOWN 0   // Interface is down
 #define MG_TCPIP_STATE_UP 1     // Interface is up
 #define MG_TCPIP_STATE_REQ 2    // Interface is up and has requested an IP
 #define MG_TCPIP_STATE_READY 3  // Interface is up and has an IP assigned
-};
+	};
 
-void mg_tcpip_init(struct mg_mgr *, struct mg_tcpip_if *);
-void mg_tcpip_free(struct mg_tcpip_if *);
-void mg_tcpip_qwrite(void *buf, size_t len, struct mg_tcpip_if *ifp);
+	void mg_tcpip_init(struct mg_mgr*, struct mg_tcpip_if*);
+	void mg_tcpip_free(struct mg_tcpip_if*);
+	void mg_tcpip_qwrite(void* buf, size_t len, struct mg_tcpip_if* ifp);
 
-extern struct mg_tcpip_driver mg_tcpip_driver_stm32f;
-extern struct mg_tcpip_driver mg_tcpip_driver_w5500;
-extern struct mg_tcpip_driver mg_tcpip_driver_tm4c;
-extern struct mg_tcpip_driver mg_tcpip_driver_stm32h;
-extern struct mg_tcpip_driver mg_tcpip_driver_imxrt;
-extern struct mg_tcpip_driver mg_tcpip_driver_same54;
-extern struct mg_tcpip_driver mg_tcpip_driver_cmsis;
+	extern struct mg_tcpip_driver mg_tcpip_driver_stm32f;
+	extern struct mg_tcpip_driver mg_tcpip_driver_w5500;
+	extern struct mg_tcpip_driver mg_tcpip_driver_tm4c;
+	extern struct mg_tcpip_driver mg_tcpip_driver_stm32h;
+	extern struct mg_tcpip_driver mg_tcpip_driver_imxrt;
+	extern struct mg_tcpip_driver mg_tcpip_driver_same54;
+	extern struct mg_tcpip_driver mg_tcpip_driver_cmsis;
 
-// Drivers that require SPI, can use this SPI abstraction
-struct mg_tcpip_spi {
-  void *spi;                        // Opaque SPI bus descriptor
-  void (*begin)(void *);            // SPI begin: slave select low
-  void (*end)(void *);              // SPI end: slave select high
-  uint8_t (*txn)(void *, uint8_t);  // SPI transaction: write 1 byte, read reply
-};
+	// Drivers that require SPI, can use this SPI abstraction
+	struct mg_tcpip_spi
+	{
+		void* spi;                        // Opaque SPI bus descriptor
+		void (*begin)(void*);            // SPI begin: slave select low
+		void (*end)(void*);              // SPI end: slave select high
+		uint8_t(*txn)(void*, uint8_t);  // SPI transaction: write 1 byte, read reply
+	};
 #endif
 
 
@@ -1930,73 +1976,78 @@ struct mg_tcpip_spi {
 #endif
 
 
-struct mg_tcpip_driver_imxrt_data {
-  // MDC clock divider. MDC clock is derived from IPS Bus clock (ipg_clk),
-  // must not exceed 2.5MHz. Configuration for clock range 2.36~2.50 MHz
-  // 37.5.1.8.2, Table 37-46 : f = ipg_clk / (2(mdc_cr + 1))
-  //    ipg_clk       mdc_cr VALUE
-  //    --------------------------
-  //                  -1  <-- TODO() tell driver to guess the value
-  //    25 MHz         4
-  //    33 MHz         6
-  //    40 MHz         7
-  //    50 MHz         9
-  //    66 MHz        13
-  int mdc_cr;  // Valid values: -1 to 63
+	struct mg_tcpip_driver_imxrt_data
+	{
+		// MDC clock divider. MDC clock is derived from IPS Bus clock (ipg_clk),
+		// must not exceed 2.5MHz. Configuration for clock range 2.36~2.50 MHz
+		// 37.5.1.8.2, Table 37-46 : f = ipg_clk / (2(mdc_cr + 1))
+		//    ipg_clk       mdc_cr VALUE
+		//    --------------------------
+		//                  -1  <-- TODO() tell driver to guess the value
+		//    25 MHz         4
+		//    33 MHz         6
+		//    40 MHz         7
+		//    50 MHz         9
+		//    66 MHz        13
+		int mdc_cr;  // Valid values: -1 to 63
 
-  uint8_t phy_addr;  // PHY address
-};
-
-
-struct mg_tcpip_driver_same54_data {
-    int mdc_cr;
-};
+		uint8_t phy_addr;  // PHY address
+	};
 
 
-struct mg_tcpip_driver_stm32f_data {
-  // MDC clock divider. MDC clock is derived from HCLK, must not exceed 2.5MHz
-  //    HCLK range    DIVIDER    mdc_cr VALUE
-  //    -------------------------------------
-  //                                -1  <-- tell driver to guess the value
-  //    60-100 MHz    HCLK/42        0
-  //    100-150 MHz   HCLK/62        1
-  //    20-35 MHz     HCLK/16        2
-  //    35-60 MHz     HCLK/26        3
-  //    150-216 MHz   HCLK/102       4  <-- value for Nucleo-F* on max speed
-  //    216-310 MHz   HCLK/124       5
-  //    110, 111 Reserved
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
-};
+	struct mg_tcpip_driver_same54_data
+	{
+		int mdc_cr;
+	};
 
 
-struct mg_tcpip_driver_stm32h_data {
-  // MDC clock divider. MDC clock is derived from HCLK, must not exceed 2.5MHz
-  //    HCLK range    DIVIDER    mdc_cr VALUE
-  //    -------------------------------------
-  //                                -1  <-- tell driver to guess the value
-  //    60-100 MHz    HCLK/42        0
-  //    100-150 MHz   HCLK/62        1
-  //    20-35 MHz     HCLK/16        2
-  //    35-60 MHz     HCLK/26        3
-  //    150-250 MHz   HCLK/102       4  <-- value for Nucleo-H* on max speed driven by HSI
-  //    250-300 MHz   HCLK/124       5  <-- value for Nucleo-H* on max speed driven by CSI
-  //    110, 111 Reserved
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
-};
+	struct mg_tcpip_driver_stm32f_data
+	{
+		// MDC clock divider. MDC clock is derived from HCLK, must not exceed 2.5MHz
+		//    HCLK range    DIVIDER    mdc_cr VALUE
+		//    -------------------------------------
+		//                                -1  <-- tell driver to guess the value
+		//    60-100 MHz    HCLK/42        0
+		//    100-150 MHz   HCLK/62        1
+		//    20-35 MHz     HCLK/16        2
+		//    35-60 MHz     HCLK/26        3
+		//    150-216 MHz   HCLK/102       4  <-- value for Nucleo-F* on max speed
+		//    216-310 MHz   HCLK/124       5
+		//    110, 111 Reserved
+		int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
+	};
 
 
-struct mg_tcpip_driver_tm4c_data {
-  // MDC clock divider. MDC clock is derived from SYSCLK, must not exceed 2.5MHz
-  //    SYSCLK range   DIVIDER   mdc_cr VALUE
-  //    -------------------------------------
-  //                                -1  <-- tell driver to guess the value
-  //    60-100 MHz    SYSCLK/42      0
-  //    100-150 MHz   SYSCLK/62      1  <-- value for EK-TM4C129* on max speed
-  //    20-35 MHz     SYSCLK/16      2
-  //    35-60 MHz     SYSCLK/26      3
-  //    0x4-0xF Reserved
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3
-};
+	struct mg_tcpip_driver_stm32h_data
+	{
+		// MDC clock divider. MDC clock is derived from HCLK, must not exceed 2.5MHz
+		//    HCLK range    DIVIDER    mdc_cr VALUE
+		//    -------------------------------------
+		//                                -1  <-- tell driver to guess the value
+		//    60-100 MHz    HCLK/42        0
+		//    100-150 MHz   HCLK/62        1
+		//    20-35 MHz     HCLK/16        2
+		//    35-60 MHz     HCLK/26        3
+		//    150-250 MHz   HCLK/102       4  <-- value for Nucleo-H* on max speed driven by HSI
+		//    250-300 MHz   HCLK/124       5  <-- value for Nucleo-H* on max speed driven by CSI
+		//    110, 111 Reserved
+		int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
+	};
+
+
+	struct mg_tcpip_driver_tm4c_data
+	{
+		// MDC clock divider. MDC clock is derived from SYSCLK, must not exceed 2.5MHz
+		//    SYSCLK range   DIVIDER   mdc_cr VALUE
+		//    -------------------------------------
+		//                                -1  <-- tell driver to guess the value
+		//    60-100 MHz    SYSCLK/42      0
+		//    100-150 MHz   SYSCLK/62      1  <-- value for EK-TM4C129* on max speed
+		//    20-35 MHz     SYSCLK/16      2
+		//    35-60 MHz     SYSCLK/26      3
+		//    0x4-0xF Reserved
+		int mdc_cr;  // Valid values: -1, 0, 1, 2, 3
+	};
 
 #ifdef __cplusplus
 }

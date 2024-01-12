@@ -5,7 +5,7 @@
 //    1. Start websocket server: cd ../websocket-server && make
 //    2. In another terminal, start this client: make
 
-#include "mongoose.h"
+#include "../../mongoose.h"
 
 static const char *s_url = "ws://localhost:8000/websocket";
 

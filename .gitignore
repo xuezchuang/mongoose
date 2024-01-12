@@ -1,0 +1,6 @@
+/build/linux/bin
+/build/linux/obj
+/.vs
+/build/linux/.vs
+/mongoose/.vs
+/mongoose/x64

@@ -3,11 +3,12 @@
 //
 // Example Websocket server. See https://mongoose.ws/tutorials/websocket-server/
 
-#include "mongoose.h"
+#include "../../mongoose.h"
 
 static const char *s_listen_on = "ws://localhost:8000";
 static const char *s_web_root = ".";
-
+#define MG_ENABLE_CUSTOM_LOG
+#define MG_ENABLE_EPOLL
 // This RESTful server implements the following endpoints:
 //   /websocket - upgrade to Websocket, and implement websocket echo server
 //   /rest - respond with JSON string {"result": 123}
@@ -32,7 +33,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   } else if (ev == MG_EV_WS_MSG) {
     // Got websocket frame. Received data is wm->data. Echo it back!
     struct mg_ws_message *wm = (struct mg_ws_message *) ev_data;
-    mg_ws_send(c, wm->data.ptr, wm->data.len, WEBSOCKET_OP_TEXT);
+	char* teat = "你好";
+	mg_ws_send(c, teat, strlen(teat)+1, WEBSOCKET_OP_TEXT);
+    //mg_ws_send(c, wm->data.ptr, wm->data.len, WEBSOCKET_OP_TEXT);
   }
   (void) fn_data;
 }
@@ -42,7 +45,7 @@ int main(void) {
   mg_mgr_init(&mgr);  // Initialise event manager
   printf("Starting WS listener on %s/websocket\n", s_listen_on);
   mg_http_listen(&mgr, s_listen_on, fn, NULL);  // Create HTTP listener
-  for (;;) mg_mgr_poll(&mgr, 1000);             // Infinite event loop
+  for (;;) mg_mgr_poll(&mgr, 5000);             // Infinite event loop
   mg_mgr_free(&mgr);
   return 0;
 }
