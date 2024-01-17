@@ -15,19 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\examples\http-client\main.c">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\mongoose.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\examples\http-server\main.c">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\examples\websocket-server\main.c">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\examples\webui-login\main.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\examples\file-upload-html-form\main.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
